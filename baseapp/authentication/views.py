@@ -22,6 +22,7 @@ from weasyprint import HTML
 import pygal
 from pygal.style import Style
 
+
 def home(request):
     return render(request, 'home.html')
 
@@ -112,7 +113,8 @@ def create_companie(request):
 
 
 def delete_companie(request, companie_id):
-    companie = get_object_or_404(Companie, pk=companie_id, created_by=request.user)
+    companie = get_object_or_404(
+        Companie, pk=companie_id, created_by=request.user)
     if request.method == "GET":
         companie.delete()
         return redirect('create_companie')
@@ -166,7 +168,7 @@ def general_report_by_companie(request, companie_id):
     vulns = ReportVulnerability.objects.filter(companie=companie_id)
     companie = Companie.objects.get(id=companie_id)
     template = get_template('pdf_report.html')
-    
+
     custom_style = Style(
         colors=('#0343df', '#e50000', '#ffff14', '#929591'),
         font_family='DejaVu Sans',
@@ -191,7 +193,8 @@ def general_report_by_companie(request, companie_id):
     # Renderiza el gráfico como SVG
     svg = chart.render().decode('utf-8')
 
-    html = template.render({'vulns': vulns, 'username':request.user.username, 'chart_svg':svg})
+    html = template.render(
+        {'vulns': vulns, 'username': request.user.username, 'chart_svg': svg})
 
     # Create a temporary file to store the PDF
     pdf_file = tempfile.NamedTemporaryFile(delete=False)
