@@ -1,0 +1,68 @@
+{% extends 'home.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h1>Create Companie</h1>
+            <form action="/companie/create/" method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <input type="text" class="form-control" name="name" value="{{name}}" placeholder="Name">
+                </div>
+                <div class="mb-3">
+                    <textarea class="form-control" name="description" rows="3" value="{{description}}"
+                        placeholder="Description"></textarea>
+                </div>
+                <div class="mb-3">
+                    <input class="form-check-input" type="checkbox" value="{{is_tested}}" name="{{is_tested}}">
+                    <label class="form-check-label" for="defaultCheck1">
+                        is tested
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+                <div class="col-auto">
+                    <span id="feedback" class="form-text text-danger">
+                        {{feedback}}
+                    </span>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-12">
+
+            <table class="table table-dark">
+                <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Is Tested</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in companies %}
+                    <tr>
+                        <th scope="row">{{c.name}}</th>
+                        <td>{{c.description}}</td>
+
+                        <td>
+                            {% if c.is_tested %}
+                            <input disabled class="form-check-input" type="checkbox"checked="true">
+                            {% else %}
+                            <input disabled class="form-check-input" type="checkbox">
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a class="btn btn-danger" href="/companie/{{c.id}}/delete" role="button">Delete</a>
+                            <a class="btn btn-primary" href="/companie/{{c.id}}/" role="button">Repor
+                                Vulnerabilities</a>
+                            <a class="btn btn-success" href="/general_report_by_companie/{{c.id}}" role="button">Genere Reports</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

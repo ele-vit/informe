@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    .chart-container {
+            width: 600px;
+            height: 400px;
+        }
+  </style>
+
+<body>
+    <h1 style="color: #5e9ca0; text-align: center;">Reporte de Vulnerabilidades</h1>
+    <hr />
+    <p>{{fecha}}</p>
+    <p style="text-align: justify;">El presente informe que se genera para la empresa <em><strong>{{companie}}
+            </strong></em>Evidencia los tipos de vulnerabilidades y sus correspondientes niveles cr&iacute;ticos. La
+        ciberseguridad es de vital importancia en la actualidad debido al creciente uso de la tecnolog&iacute;a y la
+        dependencia de los sistemas inform&aacute;ticos.</p>
+    <h2 style="color: #2e6c80;">Listado de Auditores:</h2>
+    <ul>
+        <li>{{username}}</li>
+    </ul>
+    <h2 style="color: #2e6c80;">Vulnerabilidades OWASP-TOP10:</h2>
+    <div class="chart-container">
+        {{ chart_svg|safe }}
+    </div>
+    
+
+
+
+
+</body>
+
+</html>

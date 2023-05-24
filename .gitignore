@@ -1,0 +1,48 @@
+# Python files
+*.py[co]
+
+# Lock files
+.~*
+
+# Developer folder for connect via SSH
+remote
+
+# /data folder for production environment
+/data
+
+# API, filestore
+api/src/filestore/**
+
+# Unit test / coverage reports
+coverage
+.coverage
+.tox
+
+# Translations
+*.mo
+
+# Vim swap files
+*.swp
+
+# VSCode
+.vscode
+
+# PyCharm
+.idea/
+.DS_Store
+
+# macOS
+.DS_Store
+
+# Api
+.pytest_cache
+.volumes
+poetry.lock
+
+# Envs
+.python-version
+web/.env
+.env.*
+package-lock.json
+.venv/
+venv/

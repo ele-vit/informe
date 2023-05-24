@@ -1,0 +1,25 @@
+{% extends 'home.html' %}
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <form action="/login/" method="POST">
+                {% csrf_token %}
+                <div class="mb-3">
+                    <input type="text" class="form-control" name="username" value="{{username}}" placeholder="Username">
+                </div>
+                <div class="mb-3">
+                    <input type="password" class="form-control" name="password1" value="{{password1}}"
+                        placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-primary">Log In</button>
+                <div class="col-auto">
+                    <span id="feedback" class="form-text text-danger">
+                        {{feedback}}
+                    </span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
