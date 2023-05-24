@@ -7,6 +7,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout, authenticate
 from .utils.enums.vulnerability import Vulnerability
 from django.http import HttpResponse
+from django.http import FileResponse
 from django.template.loader import get_template
 from django.db import IntegrityError
 from .models import Companie
@@ -223,12 +224,12 @@ def general_report_by_companie(request, companie_id):
     pdf_file.close()
 
     # Create a response with the PDF file
-    response = HttpResponse(content_type='application/pdf')
+    response = FileResponse(open(pdf_file.name, 'rb'), content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="output.pdf"'
 
     # Read the PDF file and write it to the response
-    with open(pdf_file.name, 'rb') as f:
-        response.write(f.read())
+    # with open(pdf_file.name, 'rb') as f:
+    #     response.write(f.read())
 
     # Delete the temporary file
     os.unlink(pdf_file.name)
