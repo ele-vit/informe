@@ -1,2 +1,2 @@
 deploy:
-	python3 baseapp/manage.py runserver
+	python3 manage.py runserver
