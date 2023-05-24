@@ -1,0 +1,91 @@
+{% extends 'home.html' %}
+{% block content_two %}
+<br>
+<style>
+  .morris-hover {
+  position:absolute;
+  z-index:1000;
+}
+
+.morris-hover.morris-default-style {     border-radius:10px;
+  padding:6px;
+  color:#666;
+  background:rgba(255, 255, 255, 0.8);
+  border:solid 2px rgba(230, 230, 230, 0.8);
+  font-family:sans-serif;
+  font-size:12px;
+  text-align:center;
+}
+
+.morris-hover.morris-default-style .morris-hover-row-label {
+  font-weight:bold;
+  margin:0.25em 0;
+}
+
+.morris-hover.morris-default-style .morris-hover-point {
+  white-space:nowrap;
+  margin:0.1em 0;
+}
+
+svg { width: 100%; }
+
+</style>
+<div class="container-fluid text-center">
+  <div class="row">
+    <div class="col-6" >
+      {% for c in companie %}
+      <div class="card text-center">
+        <div class="card-header">
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{c.name}}</h5>
+          <p class="card-text">{{c.description}}</p>
+          <a class="btn btn-primary" href="/companie/{{c.id}}/" role="button">Repor
+            Vulnerabilities</a>
+        </div>
+        <div class="card-footer text-muted">
+        </div>
+      </div>
+      <br>
+      {% endfor %}
+    </div>
+    <div class="col-6">
+      <section>
+        <div class="row">
+          <div class="col-md-12">
+            <div id="area-chart"></div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+<script>
+  $(document).ready(function() {
+  var data = "{{data}}"
+  var labels = "{{labels}}"
+  data = JSON.parse(data.replace(/&quot;/g,'"'));
+  labels = JSON.parse(labels.replace(/&quot;/g,'"'));
+  areaChart(data, labels);
+  $(window).resize(function() {
+    window.areaChart.redraw();
+  });
+});
+
+function areaChart(data, labels) {
+  window.areaChart = Morris.Area({
+    element: 'area-chart',
+    data: data,
+    xkey: 'name',
+    ykeys: labels,
+    labels: labels,
+    lineColors: ['#1e88e5','#ff3321', '#0daffd', '#0dfdf2', '#0dfd8e', '#cd0dfd', '#53fd0d', '#fd0d9d', '#fd0d44', '#fda80d', '#fd2e0d'],
+    lineWidth: '3px',
+    resize: true,
+    redraw: true,
+    parseTime: false
+  });
+}
+
+</script>
+{% endblock %}

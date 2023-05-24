@@ -3,28 +3,43 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
-from .models import Companie
-from .models import ReportVulnerability
 from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout, authenticate
+from .utils.enums.vulnerability import Vulnerability
+from django.http import HttpResponse
+from django.template.loader import get_template
 from django.db import IntegrityError
+from .models import Companie
+from .models import ReportVulnerability
 from .forms import CompanieForm
 from .forms import ResportVulnForm
 from .utils.enums.level import Level
-from .utils.enums.vulnerability import Vulnerability
-
-from django.http import HttpResponse
-from django.template.loader import get_template
-from django.template import Context
-import tempfile
 import os
-from weasyprint import HTML
+import tempfile
 import pygal
+import json
+from weasyprint import HTML
 from pygal.style import Style
 
 
 def home(request):
-    return render(request, 'home.html')
+    companie = Companie.objects.filter(created_by=request.user)
+    data = []
+    labels = []
+    for i in list(Vulnerability):
+        d = {}
+        d['name'] = i.value
+        for com in companie:
+            c = ReportVulnerability.objects.filter(
+                companie=com.id,
+                vulnerability=i.value).count()
+            d[com.name] = c
+            labels.append(com.name)
+        data.append(d)
+    return render(request, 'dashboard.html', {
+        'companie': companie,
+        'data': json.dumps(data),
+        'labels': json.dumps(list(set(labels)))})
 
 
 def signup(request):
@@ -83,7 +98,7 @@ def login(request):
 
 def signout(request):
     logout(request)
-    return redirect('home')
+    return redirect('signup')
 
 
 def create_companie(request):
@@ -180,14 +195,16 @@ def general_report_by_companie(request, companie_id):
     chart = pygal.Bar(
         title=f"{companie.name} Results",
         style=custom_style,
-        y_title='Seats',
+        y_title='Number of vulnerabilities',
         width=900,
         x_label_rotation=270,
     )
 
     # Agrega datos al gráfico
     for i in list(Vulnerability):
-        c = ReportVulnerability.objects.filter(vulnerability=i.value).count()
+        c = ReportVulnerability.objects.filter(
+            companie=companie_id,
+            vulnerability=i.value).count()
         chart.add(i.value, c)
 
     # Renderiza el gráfico como SVG

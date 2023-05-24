@@ -1,5 +1,6 @@
 {% extends 'home.html' %}
-{% block content %}
+{% block content_two %}
+<div class="row justify-content-center">
 <div class="card text-center">
     <div class="card-header"> </div>
     <div class="card-body">
@@ -18,9 +19,6 @@
     {% csrf_token %}
     <input hidden type="text" name="companie_id" value="{{companie.id}}">
     <div class="card text-center">
-        <div class="card-header">
-
-        </div>
         <div class="card-body">
             <div class="form-group container">
                 <select id="inputState" name="level" class="form-control mb-3">
@@ -46,8 +44,9 @@
     </div>
 </form>
 
-<div class="card text-center">
-    <table class="table table-dark">
+{% if vulnerabilities %}
+<div class="col-md-8">
+    <table class="table table-ligth text-center">
         <thead>
             <tr>
                 <th></th>
@@ -74,5 +73,6 @@
         </tbody>
     </table>
 </div>
-
+{% endif %}
+</div>
 {% endblock %}

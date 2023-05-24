@@ -3,16 +3,25 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
+            <h1>Log In</h1>
             <form action="/login/" method="POST">
                 {% csrf_token %}
                 <div class="mb-3">
-                    <input type="text" class="form-control" name="username" value="{{username}}" placeholder="Username">
+                    <input required type="text" class="form-control" name="username" value="{{username}}" placeholder="Username">
                 </div>
                 <div class="mb-3">
-                    <input type="password" class="form-control" name="password1" value="{{password1}}"
+                    <input required  type="password" class="form-control" name="password1" value="{{password1}}"
                         placeholder="Password">
                 </div>
-                <button type="submit" class="btn btn-primary">Log In</button>
+                
+                <div class="row">
+                    <div class="col text-center">
+                        <button type="submit" class="btn btn-primary">Log In</button>
+                    </div>
+                    <div class="col text-center">
+                        <a href="/" class="btn btn-success">Sign Up</a>
+                    </div>
+                </div> 
                 <div class="col-auto">
                     <span id="feedback" class="form-text text-danger">
                         {{feedback}}
