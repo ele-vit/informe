@@ -181,57 +181,56 @@ def delete_vul(request, vuln_id):
 
 
 def general_report_by_companie(request, companie_id):
-    vulns = ReportVulnerability.objects.filter(companie=companie_id)
-    companie = Companie.objects.get(id=companie_id)
-    template = get_template('pdf_report.html')
+    try:
+        vulns = ReportVulnerability.objects.filter(companie=companie_id)
+        companie = Companie.objects.get(id=companie_id)
+        template = get_template('pdf_report.html')
 
-    custom_style = Style(
-        colors=('#0343df', '#e50000', '#ffff14', '#929591'),
-        font_family='DejaVu Sans',
-        background='transparent',
-        label_font_size=14,
-    )
+        custom_style = Style(
+            colors=('#0343df', '#e50000', '#ffff14', '#929591'),
+            font_family='DejaVu Sans',
+            background='transparent',
+            label_font_size=14,
+        )
 
-    # Set up the bar plot, ready for data
-    chart = pygal.Bar(
-        title=f"{companie.name} Results",
-        style=custom_style,
-        y_title='Number of vulnerabilities',
-        width=900,
-        x_label_rotation=270,
-    )
+        # Set up the bar plot, ready for data
+        chart = pygal.Bar(
+            title=f"{companie.name} Results",
+            style=custom_style,
+            y_title='Number of vulnerabilities',
+            width=900,
+            x_label_rotation=270,
+        )
 
-    # Agrega datos al gráfico
-    for i in list(Vulnerability):
-        c = ReportVulnerability.objects.filter(
-            companie=companie_id,
-            vulnerability=i.value).count()
-        chart.add(i.value, c)
+        # Agrega datos al gráfico
+        for i in list(Vulnerability):
+            c = ReportVulnerability.objects.filter(
+                companie=companie_id,
+                vulnerability=i.value).count()
+            chart.add(i.value, c)
 
-    # Renderiza el gráfico como SVG
-    svg = chart.render().decode('utf-8')
+        # Renderiza el gráfico como SVG
+        svg = chart.render().decode('utf-8')
 
-    html = template.render(
-        {'vulns': vulns, 'username': request.user.username, 'chart_svg': svg})
+        html = template.render(
+            {'vulns': vulns, 'username': request.user.username, 'chart_svg': svg})
 
-    # Create a temporary file to store the PDF
-    pdf_file = tempfile.NamedTemporaryFile(delete=False)
+        # Create a temporary file to store the PDF
+        pdf_file = tempfile.NamedTemporaryFile(delete=False)
 
-    # Generate the PDF using weasyprint
-    HTML(string=html).write_pdf(pdf_file)
+        # Generate the PDF using weasyprint
+        HTML(string=html).write_pdf(pdf_file)
 
-    # Close the temporary file
-    pdf_file.close()
+        # Close the temporary file
+        pdf_file.close()
 
-    # Create a response with the PDF file
-    response = FileResponse(open(pdf_file.name, 'rb'), content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="output.pdf"'
+        # Create a response with the PDF file
+        response = FileResponse(open(pdf_file.name, 'rb'), content_type='application/pdf')
+        response['Content-Disposition'] = 'attachment; filename="output.pdf"'
 
-    # Read the PDF file and write it to the response
-    # with open(pdf_file.name, 'rb') as f:
-    #     response.write(f.read())
+        # Delete the temporary file
+        os.unlink(pdf_file.name)
 
-    # Delete the temporary file
-    os.unlink(pdf_file.name)
-
-    return response
+        return response
+    except Exception as e:
+        print(str(e))
