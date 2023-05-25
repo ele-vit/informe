@@ -219,7 +219,7 @@ def general_report_by_companie(request, companie_id):
         pdf_file = tempfile.NamedTemporaryFile(delete=False)
 
         # Generate the PDF using weasyprint
-        HTML(string=html).write_pdf(pdf_file)
+        HTML(string=html,  base_url=request.build_absolute_uri()).write_pdf(pdf_file)
 
         # Close the temporary file
         pdf_file.close()
