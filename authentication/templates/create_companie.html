@@ -28,7 +28,7 @@
             </form>
         </div>
         {% if companies %}
-        <div class="col-md-10">
+        <div class="col-md-12">
             <table class="table table-ligth text-center">
                 <thead>
                     <tr>
@@ -55,8 +55,7 @@
                             <a class="btn btn-danger" href="/companie/{{c.id}}/delete" role="button">Delete</a>
                             <a class="btn btn-primary" href="/companie/{{c.id}}/" role="button">Repor
                                 Vulnerabilities</a>
-                            <a class="btn btn-success" href="/general_report_by_companie/{{c.id}}" role="button">Genere Reports</a>
-                            <a class="btn btn-success" href="/re/{{c.id}}" role="button">Genereeee</a>
+                            <a class="btn btn-success" href="/report/{{c.id}}" role="button">Genere Report</a>
                         </td>
                     </tr>
                     {% endfor %}

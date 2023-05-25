@@ -15,17 +15,14 @@ from .models import ReportVulnerability
 from .forms import CompanieForm
 from .forms import ResportVulnForm
 from .utils.enums.level import Level
-import os
-import tempfile
 import pygal
 import json
-from weasyprint import HTML
 from pygal.style import Style
-
 from xhtml2pdf import pisa
 import io
 import cairosvg
 import base64
+
 
 def home(request):
     companie = Companie.objects.filter(created_by=request.user)
@@ -184,60 +181,6 @@ def delete_vul(request, vuln_id):
         return HttpResponseRedirect('/companie'+'/'+str(vuln.companie.id)+'/')
 
 
-def general_report_by_companie(request, companie_id):
-    vulns = ReportVulnerability.objects.filter(companie=companie_id)
-    companie = Companie.objects.get(id=companie_id)
-    template = get_template('pdf_report.html')
-
-    custom_style = Style(
-        colors=('#0343df', '#e50000', '#ffff14', '#929591'),
-        font_family='DejaVu Sans',
-        background='transparent',
-        label_font_size=14,
-    )
-
-    # Set up the bar plot, ready for data
-    chart = pygal.Bar(
-        title=f"{companie.name} Results",
-        style=custom_style,
-        y_title='Number of vulnerabilities',
-        width=900,
-        x_label_rotation=270,
-    )
-
-    # Agrega datos al gráfico
-    for i in list(Vulnerability):
-        c = ReportVulnerability.objects.filter(
-            companie=companie_id,
-            vulnerability=i.value).count()
-        chart.add(i.value, c)
-
-    # Renderiza el gráfico como SVG
-    svg = chart.render().decode('utf-8')
-
-    html = template.render(
-        {'vulns': vulns, 'username': request.user.username, 'chart_svg': svg})
-
-    # Create a temporary file to store the PDF
-    pdf_file = tempfile.NamedTemporaryFile(delete=False)
-
-    # Generate the PDF using weasyprint
-    HTML(string=html).write_pdf(pdf_file)
-
-    # Close the temporary file
-    pdf_file.close()
-
-    # Create a response with the PDF file
-    response = FileResponse(open(pdf_file.name, 'rb'),
-                            content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="output.pdf"'
-
-    # Delete the temporary file
-    os.unlink(pdf_file.name)
-
-    return response
-
-
 def gen_pdf(request, companie_id):
     vulns = ReportVulnerability.objects.filter(companie=companie_id)
     companie = Companie.objects.get(id=companie_id)
@@ -268,13 +211,11 @@ def gen_pdf(request, companie_id):
 
     # Renderiza el gráfico como SVG
     svg = chart.render().decode('utf-8')
-    # svg = svg.replace(':not(.web)', ":not('web')")
-
-    
     png_data = cairosvg.svg2png(bytestring=svg)
     png = io.BytesIO(png_data)
     template = get_template('pdf_report.html')
-    context = {'vulns': vulns, 'username': request.user.username, 'chart_svg':base64.b64encode(png.getvalue()).decode()}
+    context = {'vulns': vulns, 'username': request.user.username,
+               'chart_svg': base64.b64encode(png.getvalue()).decode()}
 
     html = template.render(context)
     response = HttpResponse(content_type='application/pdf')
