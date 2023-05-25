@@ -22,6 +22,10 @@ import json
 from weasyprint import HTML
 from pygal.style import Style
 
+from xhtml2pdf import pisa
+import io
+import cairosvg
+import base64
 
 def home(request):
     companie = Companie.objects.filter(created_by=request.user)
@@ -231,4 +235,49 @@ def general_report_by_companie(request, companie_id):
     # Delete the temporary file
     os.unlink(pdf_file.name)
 
+    return response
+
+
+def gen_pdf(request, companie_id):
+    vulns = ReportVulnerability.objects.filter(companie=companie_id)
+    companie = Companie.objects.get(id=companie_id)
+    template = get_template('pdf_report.html')
+
+    custom_style = Style(
+        colors=('#0343df', '#e50000', '#ffff14', '#929591'),
+        font_family='DejaVu Sans',
+        background='transparent',
+        label_font_size=14,
+    )
+
+    # Set up the bar plot, ready for data
+    chart = pygal.Bar(
+        title=f"{companie.name} Results",
+        style=custom_style,
+        y_title='Number of vulnerabilities',
+        width=900,
+        x_label_rotation=270,
+    )
+
+    # Agrega datos al gráfico
+    for i in list(Vulnerability):
+        c = ReportVulnerability.objects.filter(
+            companie=companie_id,
+            vulnerability=i.value).count()
+        chart.add(i.value, c)
+
+    # Renderiza el gráfico como SVG
+    svg = chart.render().decode('utf-8')
+    # svg = svg.replace(':not(.web)', ":not('web')")
+
+    
+    png_data = cairosvg.svg2png(bytestring=svg)
+    png = io.BytesIO(png_data)
+    template = get_template('pdf_report.html')
+    context = {'vulns': vulns, 'username': request.user.username, 'chart_svg':base64.b64encode(png.getvalue()).decode()}
+
+    html = template.render(context)
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="documento.pdf"'
+    pisa.CreatePDF(html, dest=response)
     return response

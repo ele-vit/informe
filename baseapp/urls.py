@@ -31,5 +31,6 @@ urlpatterns = [
     path('companie/<int:companie_id>/', views.detail_companie, name='detail_companie'),
     path('vuln/create/', views.create_vul, name='create_vul'),
     path('vuln/<int:vuln_id>/delete', views.delete_vul, name='delete_vul'),
-    path('general_report_by_companie/<int:companie_id>', views.general_report_by_companie, name='g_report_c')
+    path('general_report_by_companie/<int:companie_id>', views.general_report_by_companie, name='g_report_c'),
+    path('re/<int:companie_id>', views.gen_pdf, name='re')
 ]
